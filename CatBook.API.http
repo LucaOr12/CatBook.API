@@ -1,6 +1,0 @@
-@CatBook.API_HostAddress = http://localhost:5082
-
-GET {{CatBook.API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
