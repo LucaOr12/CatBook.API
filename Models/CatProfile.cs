@@ -6,7 +6,7 @@ public class CatProfile
 {
     public int  Id { get; set; }
     [Required]
-    public string Name { get; set; }
+    public string CatName { get; set; }
     [Required]
     public string Breed { get; set; }
     [Required]
