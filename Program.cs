@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? builder.Configuration.GetConnectionString("SUPABASE-HOST");
 
+//Database context
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<CatBookContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddControllers();
@@ -24,7 +26,7 @@ builder.Services.AddAuthentication(options =>
     {
         var googleAuthNSection = builder.Configuration.GetSection("Authentication:Google");
         options.ClientId = googleAuthNSection["ClientId"];
-        options.ClientSecret = googleAuthNSection["ClientSecret"];;
+        options.ClientSecret = googleAuthNSection["ClientSecret"];
         options.CallbackPath = "/signin-google";
     });
 
@@ -43,18 +45,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.MapGet("login", async context =>
-{
-    await context.ChallengeAsync(GoogleDefaults.AuthenticationScheme, new AuthenticationProperties
-    {
-        RedirectUri = "/profile"
-    });
-});
-app.MapGet("/profile", [Authorize](HttpContext context) =>
-{
-    var user = context.User.Identity?.Name;
-    return Results.Ok($"Welcome {user}");
-});
 
 app.Run();
 
