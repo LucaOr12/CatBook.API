@@ -2,8 +2,7 @@ using System.Security.Claims;
 using CatBook.API.Data;
 using CatBook.API.DTOs;
 using CatBook.API.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,51 +14,46 @@ namespace CatBook.API.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
+    private readonly IConfiguration _config;
     private readonly CatBookContext _context;
 
-    public UsersController(CatBookContext context) { _context = context; }
+    public UsersController(IConfiguration config, CatBookContext context)
+    {
+        _config = config;
+        _context = context;
+    }
 
     [AllowAnonymous]
-    [HttpGet("/auth/google-login")]
-    public async Task<ActionResult<User>> AuthLogin()
+    [HttpPost("/auth/google")]
+    public async Task<ActionResult<User>> AuthWithGoogle()
     {
-        var auth = new AuthenticationProperties()
-        {
-            RedirectUri = "/profile"
-        };
-        return Challenge(auth, GoogleDefaults.AuthenticationScheme);
-    }
-
-    //testing endpoint
-    [HttpGet("/profile")]
-    public IActionResult Profile()
-    {
-        var name = User.Identity?.Name;
-        var email = User.FindFirstValue(ClaimTypes.Email);
-        
-        return Ok(new {name, email});
-    }
-
-    [HttpPost]
-    public async Task<ActionResult<User>> CreateUser()
-    {
-        var googleId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var email = User.FindFirstValue(ClaimTypes.Email);
-        var displayName = User.FindFirstValue(ClaimTypes.Name);
-        if (googleId == null)
+        var authHeader = Request.Headers["Authorization"].ToString();;
+        if (!authHeader.StartsWith("Bearer "))
             return Unauthorized();
-        
-        var newUser = new User
-        {
-            GoogleId = googleId,
-            Email = email,
-            DisplayName = displayName
-        };
-        _context.Users.Add(newUser);
-        await _context.SaveChangesAsync();
-        return Ok(newUser);
-    }
 
+        var token = authHeader["Bearer ".Length..];
+
+        var payload = await GoogleJsonWebSignature.ValidateAsync(token, new GoogleJsonWebSignature.ValidationSettings
+        {
+            Audience = new[] { _config["Authentication:Google:ClientId"] }
+        });
+        
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == payload.Subject);
+        if (user == null)
+        {
+            user = new User
+            {
+                GoogleId = payload.Subject,
+                Email = payload.Email,
+                DisplayName = payload.Name,
+            };
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+        }
+        return Ok(user);
+    }
+    
+    
     [HttpPatch("me")]
     public async Task<ActionResult<User>> PatchUser([FromBody] UserDTO dto)
     {

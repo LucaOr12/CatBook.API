@@ -12,4 +12,5 @@ public class CatBookContext : DbContext
     public DbSet<CatProfile> CatProfiles { get; set; }
     
     public DbSet<User> Users { get; set; }
+    
 }
