@@ -19,5 +19,5 @@ public class User
     public string Role { get; set; } = "User";
     
     //Cat Profile Relation
-    public CatProfile Profile { get; set; }
+    public CatProfile? Profile { get; set; }
 }
