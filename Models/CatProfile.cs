@@ -4,7 +4,7 @@ namespace CatBook.API.Models;
 
 public class CatProfile
 {
-    public int Id { get; set; }
+    public int  Id { get; set; }
     [Required]
     public string Name { get; set; }
     [Required]

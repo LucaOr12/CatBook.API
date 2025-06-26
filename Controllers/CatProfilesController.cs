@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace CatBook.API.Controllers;
-[Route("api/[controller]")]
+
+
 [ApiController]
+[Route("api/[controller]")]
 public class CatProfilesController : ControllerBase
 {
     private readonly CatBookContext _context;
