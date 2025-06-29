@@ -12,6 +12,10 @@ public class Post
     [Required]
     public DateTime PostedAt { get; set; } = DateTime.UtcNow;
     
+    //Post Interaction
+    public int? Likes { get; set; }
+    public List<string>? Comments { get; set; }
+    
     //foreign Key
     public int CatProfileId { get; set; }
     public CatProfile CatProfile { get; set; }
