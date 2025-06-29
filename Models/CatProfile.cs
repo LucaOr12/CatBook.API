@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace CatBook.API.Models;
 
@@ -16,9 +18,10 @@ public class CatProfile
     [Required]
     public string Bio { get; set; }
     
-    public List<Post> Posts { get; set; } 
+    public List<Post>? Posts { get; set; } 
     
     //foreign Key
     public int UserId { get; set; }
-    public User User { get; set; }
+    [JsonIgnore]
+    public User? User { get; set; }
 }

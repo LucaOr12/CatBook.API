@@ -38,7 +38,8 @@ public class UsersController : ControllerBase
         return Ok(new UserDTO
         {
             DisplayName = user.DisplayName,
-            Role = user.Role
+            Role = user.Role,
+            Profile = user.Profile
         });
     }
 

@@ -42,6 +42,8 @@ public class CatProfilesController : ControllerBase
         if(user.Profile != null) return BadRequest("User already has a Cat profile");
         
         user.Profile = profile;
+        
+        profile.UserId = user.Id;
         await _context.SaveChangesAsync();
         return Ok(profile);
     }
