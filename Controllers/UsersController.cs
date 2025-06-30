@@ -27,20 +27,22 @@ public class UsersController : ControllerBase
     [HttpGet("loggedUser")]
     public async Task<ActionResult<UserDTO>> GetLoggedUser()
     {
-        var googleId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var googleId = User
+            .FindFirstValue(ClaimTypes.NameIdentifier);
         if (googleId == null)
             return Unauthorized();
 
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId);
+        var user = await _context.Users.Include(user => user.Profile).FirstOrDefaultAsync(u => u.GoogleId == googleId);
         if (user == null)
             return NotFound();
 
-        return Ok(new UserDTO
+        var userDto = new UserDTO
         {
             DisplayName = user.DisplayName,
             Role = user.Role,
             Profile = user.Profile
-        });
+        };
+        return Ok(userDto);
     }
 
     [AllowAnonymous]
