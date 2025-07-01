@@ -1,7 +1,9 @@
 using System.Security.Claims;
 using CatBook.API.Data;
+using CatBook.API.DTOs;
 using CatBook.API.Models;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +13,7 @@ namespace CatBook.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class PostsController : ControllerBase
 {
     private readonly CatBookContext _context;
@@ -19,7 +22,23 @@ public class PostsController : ControllerBase
     {
         _context = context;
     }
-    
+
+    [AllowAnonymous]
+    [HttpGet("all")]
+    public async Task<ActionResult<IEnumerable<Post>>> GetAllPosts()
+    {
+        var posts = await _context.Posts.OrderByDescending(p => p.PostedAt)
+            .Select(p => new Post
+            {
+                Caption = p.Caption,
+                ImageUrl = p.ImageUrl,
+                PostedAt = p.PostedAt,
+                Likes = p.Likes,
+                Comments = p.Comments,
+                CatName = p.CatName
+            }).ToListAsync();
+        return Ok(posts);
+    }    
     [HttpGet("me")]
     public async Task<ActionResult<IEnumerable<Post>>> MyPosts()
     {
@@ -37,7 +56,7 @@ public class PostsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Post>> CreatePost([FromBody] Post post)
+    public async Task<ActionResult<Post>> CreatePost([FromBody] PostDTO dto)
     {
         var googleId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (googleId == null) return Unauthorized();
@@ -46,18 +65,20 @@ public class PostsController : ControllerBase
         
         if(user?.Profile == null)
             return BadRequest("User does not have a profile");
-        
-        post.PostedAt = DateTime.UtcNow;
-        post.Likes = 0;
-        post.Comments = new List<string>();
-        
-        post.CatProfileId = user.Profile.Id;
-        post.CatName = user.Profile.CatName;
-        
-        post.CatProfile = null;
-        
+
+        var post = new Post
+        {
+            Caption = dto.Caption,
+            ImageUrl = dto.ImageUrl,
+            PostedAt = DateTime.UtcNow,
+            Likes = 0,
+            Comments = new List<string>(),
+            CatProfileId = user.Profile.Id,
+            CatName = user.Profile.CatName
+        };
         _context.Posts.Add(post);
         await _context.SaveChangesAsync();
+        
         return Ok(post);
     }
 }

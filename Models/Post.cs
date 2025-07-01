@@ -8,7 +8,6 @@ public class Post
     public int Id { get; set; }
     
     //Post Content
-    [Required]
     public string CatName { get; set; }
     [Required]
     public string ImageUrl { get; set; }
