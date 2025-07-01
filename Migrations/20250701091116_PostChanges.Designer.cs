@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using CatBook.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CatBook.API.Migrations
 {
     [DbContext(typeof(CatBookContext))]
-    partial class CatBookContextModelSnapshot : ModelSnapshot
+    [Migration("20250701091116_PostChanges")]
+    partial class PostChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,10 +69,6 @@ namespace CatBook.API.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Caption")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("CatName")
                         .IsRequired()
                         .HasColumnType("text");
 

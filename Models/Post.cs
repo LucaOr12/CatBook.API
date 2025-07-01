@@ -1,10 +1,15 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace CatBook.API.Models;
 
 public class Post
 {
     public int Id { get; set; }
+    
+    //Post Content
+    [Required]
+    public string CatName { get; set; }
     [Required]
     public string ImageUrl { get; set; }
     [Required]
@@ -18,5 +23,6 @@ public class Post
     
     //foreign Key
     public int CatProfileId { get; set; }
-    public CatProfile CatProfile { get; set; }
+    [JsonIgnore]
+    public CatProfile? CatProfile { get; set; }
 }
