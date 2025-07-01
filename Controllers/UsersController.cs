@@ -32,7 +32,7 @@ public class UsersController : ControllerBase
         if (googleId == null)
             return Unauthorized();
 
-        var user = await _context.Users.Include(user => user.Profile).FirstOrDefaultAsync(u => u.GoogleId == googleId);
+        var user = await _context.Users.Include(user => user.Profile).ThenInclude(p => p.Posts).FirstOrDefaultAsync(u => u.GoogleId == googleId);
         if (user == null)
             return NotFound();
 
