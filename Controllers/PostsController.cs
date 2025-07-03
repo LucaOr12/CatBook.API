@@ -24,6 +24,10 @@ public class PostsController : ControllerBase
     }
 
     [AllowAnonymous]
+    [HttpHead("ping")]
+    public IActionResult Ping() => Ok("I'm Alive!");
+
+    [AllowAnonymous]
     [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<Post>>> GetAllPosts()
     {

@@ -29,6 +29,24 @@ public class CatProfilesController : ControllerBase
         if(user == null) return NotFound();
         return Ok(user.Profile);
     }
+    
+    [AllowAnonymous]
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<CatProfile>>> SearchProfiles([FromQuery] string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return Ok(new List<CatProfile>());
+
+        var lowerQuery = query.ToLower();
+        var results = await _context.CatProfiles
+            .Where(p =>
+                p.CatName.ToLower().Contains(lowerQuery) ||
+                p.Breed.ToLower().Contains(lowerQuery) ||
+                p.Age.ToString() == lowerQuery)
+            .ToListAsync();
+
+        return Ok(results);
+    }
 
 
     [HttpPost]
