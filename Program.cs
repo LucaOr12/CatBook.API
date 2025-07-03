@@ -13,8 +13,8 @@ builder.Services.AddAuthentication("CookieAuth")
         options.Cookie.Name = "CatBookAuthCookie";
         options.Cookie.HttpOnly = true;
         options.Cookie.SameSite = SameSiteMode.Strict;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // se usi HTTPS
-        options.LoginPath = "/auth/google"; // o una pagina login custom
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.LoginPath = "/auth/google";
         options.ExpireTimeSpan = TimeSpan.FromDays(15);
     });
 
