@@ -6,6 +6,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
     ?? builder.Configuration.GetConnectionString("SUPABASE-HOST");
 
 var frontendUrl = "http://localhost:3000" ?? "hosting-connection-url";
+var corsPolicy = "FrontendPolicy";
 
 builder.Services.AddAuthentication("CookieAuth")
     .AddCookie("CookieAuth", options =>
@@ -34,7 +35,7 @@ builder.Services.AddDbContext<CatBookContext>(options => options.UseNpgsql(conne
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: frontendUrl, policy=> policy.WithOrigins(frontendUrl).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
+    options.AddPolicy(name: corsPolicy, policy=> policy.WithOrigins(frontendUrl).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
 });
 
 builder.Services.AddControllers();
@@ -48,7 +49,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors(frontendUrl);
+app.UseCors(corsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
