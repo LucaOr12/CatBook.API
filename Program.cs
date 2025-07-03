@@ -5,8 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? builder.Configuration.GetConnectionString("SUPABASE-HOST");
 
-var frontendUrl = "http://localhost:3000" ?? "hosting-connection-url";
-var corsPolicy = "FrontendPolicy";
+
 
 builder.Services.AddAuthentication("CookieAuth")
     .AddCookie("CookieAuth", options =>
@@ -35,7 +34,8 @@ builder.Services.AddDbContext<CatBookContext>(options => options.UseNpgsql(conne
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: corsPolicy, policy=> policy.WithOrigins(frontendUrl).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
+    options.AddPolicy("AllowFrontend",
+        policy => policy.WithOrigins("http://localhost:3000", "cat-book-six.vercel.app").AllowAnyMethod().AllowAnyHeader());
 });
 
 builder.Services.AddControllers();
@@ -49,7 +49,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors(corsPolicy);
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
