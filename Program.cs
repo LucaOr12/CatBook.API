@@ -35,7 +35,7 @@ builder.Services.AddDbContext<CatBookContext>(options => options.UseNpgsql(conne
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
-        policy => policy.WithOrigins("http://localhost:3000", "https://cat-book-six.vercel.app").AllowAnyMethod().AllowAnyHeader());
+        policy => policy.WithOrigins("http://localhost:3000", "https://cat-book-six.vercel.app").AllowAnyMethod().AllowAnyHeader().AllowCredentials());
 });
 
 builder.Services.AddControllers();
