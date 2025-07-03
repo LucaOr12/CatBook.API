@@ -16,6 +16,12 @@ builder.Services.AddAuthentication("CookieAuth")
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.LoginPath = "/auth/google";
         options.ExpireTimeSpan = TimeSpan.FromDays(15);
+        
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        };
     });
 
 builder.Services.AddAuthorization(options =>
